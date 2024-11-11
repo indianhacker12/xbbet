@@ -1,0 +1,212 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color:rgb(7, 30, 30);
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-size: 1.5em;
+    
+   
+}
+
+.container {
+    max-width: 400px;
+    height:750px;
+    margin: 0 auto;
+    padding: 10px;
+    
+    border-radius:10px;
+}
+
+
+.wallet-section {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f2a900;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.balance {
+    font-size: 20px;
+}
+
+.wallet-actions button {
+    background-color: #fff;
+    border: none;
+    padding: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.game-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.game-btn {
+    background-color: #333;
+    border: none;
+    padding: 10px;
+    flex: 1;
+    margin-right: 10px;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.timer {
+    font-size: 18px;
+}
+
+.color-selection {
+    display: flex;
+    justify-content: space-between;
+}
+
+.color-btn {
+    background-color: #333;
+    border: none;
+    padding: 10px;
+    flex: 1;
+    margin-right: 10px;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 5px;
+}
+
+
+.green { 
+    background-color: rgb(7, 153, 1);
+    border: 1px solid rgb(7, 8, 32);
+    
+ }
+
+.green:hover { 
+    background-color: rgb(29, 101, 15);
+
+    
+    
+ }
+
+
+.violet {
+     background-color:rgb(144, 9, 144);
+     border: 1px solid rgb(7, 8, 32);
+     }
+     
+.violet:hover{
+    background-color: rgb(111, 8, 111);
+    
+     }
+     
+.red { 
+    background-color: rgb(191, 7, 7);
+    border: 1px solid rgb(7, 8, 32);
+    
+ }
+.red:hover { 
+    background-color: rgba(191, 7, 7, 0.779);
+    
+   
+ }
+
+
+.number-selection {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.number-btn {
+    background-color: #444;
+    border: none;
+    padding: 10px;
+    flex: 1;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #fff;
+}
+
+.bet-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.bet-btn {
+    background-color: #0e0d0d;
+    border: none;
+    padding: 10px;
+    flex: 1;
+    margin-right: 10px;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 5px;
+}
+.bet-btn:hover {
+    background-color: #1c1818;
+    
+    
+}
+
+.bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+footer{
+    color: #020242;
+}
+.nav-btn {
+    background-color: #020242;
+    padding: 4px;
+    border: none;
+    color: #fff;
+    flex: 1;
+    margin-right: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    max-height: fit-content;
+    max-width: fit-content;
+    
+}
+.nav-btn:hover{
+    background-color: #140537;
+
+}
+/* Popup styling */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: #72d2;
+    border: 2px solid #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    z-index: 1000;
+}
+.popup.hidden {
+    display: none;
+}
+.btn{
+    background-color: aqua;
+    font-size: medium;
+    border-radius: 10px;
+
+}

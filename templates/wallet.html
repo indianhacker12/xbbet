@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+    <link rel="shortcut icon" href="/static/img/xbt.jpg" type="image/x-icon">
+    <style>
+        /* Reset and Basic Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e7ded7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #0a0808;
+            
+        }
+        .wallet-container {
+            background-color: #44c97e;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: #0a70e6;
+            margin-bottom: 10px;
+        }
+        .balance {
+            font-size: 1.5em;
+            
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group input {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus {
+            border-color: #4a90e2;
+        }
+        .form-group button {
+            background-color: #5716f0;
+            color: #fff;
+            border: none;
+            padding: 12px 0;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .form-group button:hover {
+            background-color: #357ab8;
+        }
+        .form-group button:active {
+            transform: scale(0.98);
+        }
+        .flash-message {
+            margin-top: 20px;
+            padding: 10px;
+            color: #fff;
+            background-color: #ff5252;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="wallet-container">
+        <h2>Your Wallet</h2>
+        <p class="balance">Balance: ₹{{ user.wallet_balance }}</p>
+        
+        <form method="POST" action="{{ url_for('wallet') }}" class="form-group">
+            <input type="number" name="amount" placeholder="Enter amount" required>
+            <button type="submit" name="action" value="deposit">Deposit</button>
+            <button type="submit" name="action" value="withdraw">Withdraw</button>
+        </form>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>

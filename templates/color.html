@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Prediction Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; text-align: center; }
+        .balance { margin: 20px 0; }
+        .color-btn { margin: 10px; padding: 10px 20px; font-size: 18px; cursor: pointer; }
+        .color-btn.selected { border: 2px solid black; }
+        .history { margin-top: 20px; }
+        .result { font-size: 24px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="balance">
+        <h3>Wallet Balance: ₹<span id="wallet-balance">{{ user.wallet_balance }}</span></h3>
+    </div>
+
+    <h2>Select a color and place your bet!</h2>
+    <div class="color-selection">
+        <button class="color-btn green" onclick="selectColor('green')">Green</button>
+        <button class="color-btn red" onclick="selectColor('red')">Red</button>
+        <button class="color-btn violet" onclick="selectColor('violet')">Violet</button>
+    </div>
+
+    <div>
+        <label for="bet-amount">Bet Amount: ₹</label>
+        <input type="number" id="bet-amount" value="10" min="1">
+    </div>
+
+    <button onclick="placeBet()">Place Bet</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="history">
+        <h3>Game History</h3>
+        <ul id="history-list"></ul>
+    </div>
+</div>
+
+<script>
+    let selectedColor = null;
+
+    function selectColor(color) {
+        selectedColor = color;
+        document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelector(`.color-btn.${color}`).classList.add('selected');
+    }
+
+    async function placeBet() {
+        const betAmount = parseFloat(document.getElementById('bet-amount').value);
+        if (!selectedColor) {
+            alert('Please select a color!');
+            return;
+        }
+
+        const response = await fetch('/place_bet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bet_color: selectedColor, bet_amount: betAmount })
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            document.getElementById('result').innerText = `You bet on ${result.bet_color}. Winning color: ${result.winning_color}. ${result.result.charAt(0).toUpperCase() + result.result.slice(1)}!`;
+            document.getElementById('wallet-balance').innerText = result.new_balance;
+            fetchHistory();  // Refresh game history
+        } else {
+            alert(result.message);
+        }
+    }
+
+    async function fetchHistory() {
+        const response = await fetch('/game_history');
+        const history = await response.json();
+        const historyList = document.getElementById('history-list');
+        historyList.innerHTML = '';
+        history.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.innerText = `Bet: ${item.bet_color}, Win: ${item.winning_color}, Bet Amount: ₹${item.bet_amount}, Result: ${item.result}`;
+            historyList.appendChild(listItem);
+        });
+    }
+
+    // Load game history when the page loads
+    fetchHistory();
+</script>
+
+</body>
+</html>

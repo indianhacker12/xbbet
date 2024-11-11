@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Prediction Game</title>
+    <link rel="stylesheet" href="/static/css/color.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Wallet Section -->
+        <div class="wallet-section">
+            <div class="balance" id="wallet-balance">₹<span id="wallet-balance-amount">{{ user.wallet_balance }}</span> <span>Wallet Balance</span></div>
+        </div>
+        
+        <!-- Game Info -->
+        <div class="game-info">
+            <div class="period">Period: <span id="period-id"></span></div>
+            <div class="timer">Time Remaining: <span id="timer">30</span>s</div>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="color-selection">
+            <button class="color-btn green" onclick="selectColor('green')">Green</button>
+            <button class="color-btn red" onclick="selectColor('red')">Red</button>
+            <button class="color-btn violet" onclick="selectColor('violet')">Violet</button>
+        </div>
+
+        <!-- Bet Amount -->
+        <div class="bet-section">
+            <label for="bet-amount">Bet Amount:</label>
+            <input type="number" id="bet-amount" value="10" min="1">
+        </div>
+
+        <!-- Bet Button -->
+        <button class="bet-btn" id="place-bet-btn" onclick="placeBet()">Place Bet</button>
+
+        <!-- Game Result and History -->
+        <div class="game-result">
+            <h3>Result:</h3>
+            <div id="result"></div>
+            <h3>Win History:</h3>
+            <div id="win-history"></div>
+        </div>
+
+        <!-- Popup Message -->
+        <div id="popup-message" class="popup hidden">
+            <span id="popup-text"></span>
+             <button class="btn" onclick="closePopup()">Close</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <footer>
+            <div class="bottom-nav">
+                <a href="{{ url_for('home') }}" class="nav-btn">Home</a>
+                <a href="{{ url_for('account') }}" class="nav-btn">Account</a>
+                <a href="{{ url_for('contact') }}" class="nav-btn">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log("Script loaded");
+
+        // Fetch and display the win history on load
+        fetchWinHistory();
+
+        // Function to update the wallet balance display
+        function updateWalletBalance(newBalance) {
+            document.getElementById('wallet-balance-amount').textContent = newBalance.toFixed(2);
+        }
+
+        // Function to place a bet
+        async function placeBet() {
+            const selectedColor = window.selectedColor;
+            const betAmount = parseFloat(document.getElementById('bet-amount').value);
+            
+
+            if (!selectedColor) {
+                showPopup('Please select a color to place a bet.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/color-prediction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ selected_color: selectedColor, bet_amount: betAmount })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showPopup(errorData.message || 'An error occurred. Please try again.');
+                    return;
+                }
+
+                const result = await response.json();
+                console.log(result); // Check for debugging
+
+                if (result.status === 'success') {
+                    updateWalletBalance(result.new_balance);
+                    document.getElementById('result').innerText = `Winning Color: ${result.result}`;
+                    showPopup(result.message);
+                    fetchWinHistory();
+                } else {
+                    showPopup(result.message);
+                }
+            } catch (error) {
+                console.error('Error placing bet:', error);
+                showPopup('Network error. Please check your connection.');
+            }
+        }
+
+        // Set the selected color and highlight the selected button
+        function selectColor(color) {
+            window.selectedColor = color;
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`.color-btn.${color}`).classList.add('selected');
+        }
+
+        // Function to fetch win history
+        async function fetchWinHistory() {
+            try {
+                const response = await fetch('/color-prediction/history');
+                if (!response.ok) throw new Error('Failed to load history');
+
+                const history = await response.json();
+                const historyContainer = document.getElementById('win-history');
+                historyContainer.innerHTML = '';
+
+                history.forEach(item => {
+                    const historyEntry = document.createElement('div');
+                    historyEntry.innerText = `Predicted: ${item.prediction}, Actual: ${item.actual_color}, Amount: ₹${item.bet_amount}, ${item.win ? 'Win' : 'Loss'}`;
+                    historyContainer.appendChild(historyEntry);
+                });
+            } catch (error) {
+                console.error('Error fetching history:', error);
+            }
+        }
+
+        // Show popup message
+        function showPopup(message) {
+            document.getElementById('popup-text').textContent = message;
+            document.getElementById('popup-message').classList.remove('hidden');
+        }
+
+        // Close popup message
+        function closePopup() {
+            document.getElementById('popup-message').classList.add('hidden');
+        }
+    });
+    </script>
+
+</body>
+</html>

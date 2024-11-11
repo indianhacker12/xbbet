@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odd/Even Game</title>
+    <link rel="shortcut icon" href="/static/img/xbt.jpg" type="image/x-icon">
+    <style>
+        /* General styling for game layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #071c39;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0px;
+        }
+
+        .game-container {
+            background-color: #dedfe8;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 90%;
+            
+            height: auto; /* Changed to auto for better layout */
+            
+            text-align: center;
+            border: 2px solid rgba(193, 193, 211, 1.3); /* Corrected rgba format */
+        }
+
+        h2 {
+            color: #3b5998;
+        }
+
+        .wallet-balance {
+            font-size: 1.2em;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .timer {
+            font-size: 1.2em;
+            color: whitesmoke;
+            font-weight: bold;
+            margin: 20px 0;
+            border: 2px solid rgb(70, 87, 84);
+            background-color: red;
+            border-radius: 10px;
+            margin: 1px;
+            padding: 5px;
+            
+            
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+           
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-odd {
+            background-color: #007bff;
+        }
+
+        .button-odd:hover {
+            background-color: #0056b3;
+        }
+
+        .button-even {
+            background-color: #28a745;
+        }
+
+        .button-even:hover {
+            background-color: #1e7e34;
+        }
+
+        .game-history {
+            margin-top: 30px;
+        }
+
+        .game-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .game-history li {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .result-win {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .result-lost {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .game-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #FF6347; /* Adjusted color for visibility */
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h2>Odd Even Game</h2>
+        <p class="wallet-balance">Wallet Balance: ₹{{ user.wallet_balance }}</p>
+
+        <!-- Timer display -->
+        <div class="timer">
+            Time Remaining: <span id="timer">30</span> seconds
+        </div>
+        
+        <!-- Bet Form -->
+        <form method="POST">
+            <label for="amount">Bet Amount:</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="10" placeholder="Enter your bet amount" required>
+            
+            <label>Prediction:</label>
+            <div class="button-group">
+                <button type="submit" name="prediction" value="Odd" class="button-odd" id="oddButton">Odd</button>
+                <button type="submit" name="prediction" value="Even" class="button-even" id="evenButton">Even</button>
+            </div>
+        </form>
+
+        <!-- Game Result Display -->
+        <div class="game-result" id="gameResult" style="display:none;"></div>
+
+        <!-- Game History -->
+        <div class="game-history">
+            <h3>Game History</h3>
+            <ul>
+                {% for result in user.odd_even_game_results %}
+                    <li>
+                        Bet Amount: ₹{{ result.bet_amount }} - Prediction: {{ result.prediction }} - 
+                        Result: {{ result.result }} - 
+                        <span class="{{ 'result-win' if result.win else 'result-lost' }}">
+                            {% if result.win %} Won {% else %} Lost {% endif %}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialize timer variables
+        let timerDuration = 30;
+        let timerElement = document.getElementById("timer");
+        let timeRemaining = timerDuration;
+
+        // Get button elements for enabling/disabling
+        const oddButton = document.getElementById("oddButton");
+        const evenButton = document.getElementById("evenButton");
+        const gameResultElement = document.getElementById("gameResult");
+
+        // Countdown timer function
+        function startTimer() {
+            // Reset timer and enable buttons at the beginning
+            timeRemaining = timerDuration;
+            timerElement.textContent = timeRemaining;
+            oddButton.disabled = false;
+            evenButton.disabled = false;
+            gameResultElement.style.display = "none"; // Hide previous result
+
+            const countdown = setInterval(() => {
+                timeRemaining--;
+                timerElement.textContent = timeRemaining;
+
+                // Show result in the last 5 seconds
+                if (timeRemaining <= 5 && timeRemaining > 0) {
+                    const result = Math.random() < 0.5 ? "Odd" : "Even"; // Simulated game logic
+                    gameResultElement.textContent = `Result will be: ${result}`;
+                    gameResultElement.style.display = "block"; // Show the result
+                }
+
+                // Disable buttons in the last 5 seconds
+                if (timeRemaining <= 5 && timeRemaining > 0) {
+                    oddButton.disabled = true;
+                    evenButton.disabled = true;
+                }
+
+                if (timeRemaining <= 0) {
+                    clearInterval(countdown);
+                    gameResultElement.textContent = "Time's up! Please wait for the next round.";
+                    // Optionally reset the game or take additional actions here
+                    setTimeout(() => {
+                        startTimer();  // Restart timer after 30 seconds
+                    }, 1000);  // Delay before restarting
+                }
+            }, 1000); // Update every second
+        }
+
+        // Start timer on page load
+        startTimer();
+    </script>
+</body>
+</html>
